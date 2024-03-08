@@ -6,12 +6,16 @@ import {
   updateTodo,
   deleteToDo,
 } from "./utils/HandleApis";
+import { useAuth0 } from "@auth0/auth0-react";
 
 function App() {
   const [toDo, setToDo] = useState([]);
   const [text, setText] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [toDoId, setToDoId] = useState("");
+  const { loginWithRedirect, isAuthenticated, user } = useAuth0();
+  const { logout } = useAuth0();
+
   useEffect(() => {
     getAllToDo(setToDo);
   }, []);
@@ -26,7 +30,6 @@ function App() {
     <div className="App">
       <div className="container">
         <h1>Today Tasks</h1>
-
         <div className="top">
           <input
             type="text"
@@ -56,6 +59,32 @@ function App() {
               deleteToDo={() => deleteToDo(item._id, setToDo)}
             />
           ))}
+        </div>
+        <div className="button">
+          {isAuthenticated ? (
+            <button
+              className="btn"
+              onClick={() =>
+                logout({ logoutParams: { returnTo: window.location.origin } })
+              }
+            >
+              Logout
+            </button>
+          ) : (
+            <button onClick={() => loginWithRedirect()} className="btn">
+              Log In
+            </button>
+          )}
+        </div>
+
+        <div className="welcomeText">
+          {isAuthenticated && (
+            <div>
+              {" "}
+              <h2>Welcome Back </h2>
+              <h3>{user.name}</h3>
+            </div>
+          )}
         </div>
       </div>
     </div>
